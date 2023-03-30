@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 
 '''
 Pytorch tutorial followed: https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
+- https://pytorch.org/hub/pytorch_vision_resnet/
 '''
 
 # training_data = datasets.ImageNet(
@@ -105,7 +106,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
         # Each epoch has a training and validation phase
         for phase in ['train_data', 'test_data']:
-            loop = tqdm(dataloaders[phase])
+            #loop = tqdm(dataloaders[phase])
             if phase == 'train_data':
                 model.train()  # Set model to training mode
             else:
@@ -114,6 +115,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             running_loss = 0.0
             running_corrects = 0
 
+            #loop = tqdm(dataloaders[phase])
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
@@ -185,6 +187,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
 if __name__ == '__main__':
     model, hist = train_model(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
+    torch.save(model,"resnet_fine_tuned.pkl")
 #train_model(model,optimizer=optim,num_epochs=epochs)
 
 #evaluate(model,device,test_data)
