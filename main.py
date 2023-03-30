@@ -18,35 +18,22 @@ from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 
 '''
-Pytorch tutorial followed: https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
+Pytorch tutorial followed:
+- https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
 - https://pytorch.org/hub/pytorch_vision_resnet/
 '''
-
-# training_data = datasets.ImageNet(
-#     root="data",
-#     train=True,
-#     download=True,
-#     transform=ToTensor()
-# )
-#
-# test_data = datasets.ImageNet(
-#     root="data",
-#     train=False,
-#     download=True,
-#     transform=ToTensor()
-# )
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
         for param in model.parameters():
             param.requires_grad = False
-
+torch.manual_seed(42)
 model = models.resnet101(weights=models.ResNet101_Weights.IMAGENET1K_V1)
 
 data_dir = "snake_images"
 num_classes = len(os.listdir(data_dir+"/train_data"))
 batch_size = 8
-epochs = 15
+epochs = 100
 lr = 0.001
 feature_extract = True
 set_parameter_requires_grad(model, feature_extract)
@@ -143,7 +130,7 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds == labels.data) #modify this if we want top-1 accuracy
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
@@ -167,27 +154,64 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
     model.load_state_dict(best_model_wts)
     return model, val_acc_history
 
-# def evaluate(mode, device, eval_loader):
-#     model.eval()
-#     loss = 0
-#     corr = 0
-#     with torch.no_grad():
-#         for data, target in eval_loader:
-#             data, target = data.to('cuda'), target.to('cuda')
-#             output = model(data)
-#             pred = output.argmax(1,keepdim=True)
-#             print(pred, target)
-#             corr += pred.eq(target.view_as(pred)).sum().item()
-#
-#     loss /= len(eval_loader.dataset)
-#
-#     print('\nTest set: Accuracy: {}/{} ({:.0f}%)\n'.format(
-#         corr, len(eval_loader.dataset),
-#         100. * corr / len(eval_loader.dataset)))
+def blind_eval(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
+    since = time.time()
+
+    val_acc_history = []
+
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_acc = 0.0
+    for epoch in range(num_epochs):
+        print("Beginning Evaluation")#print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
+        model.eval()
+
+        running_loss = 0.0
+        running_corrects = 0
+        for inputs, labels in dataloaders["test_data"]:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward
+            # track history if only in train
+            with torch.set_grad_enabled(False):
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                _, preds = torch.max(outputs, 1)
+
+            # statistics
+            running_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)  # modify this if we want top-1 accuracy
+
+            epoch_loss = running_loss / len(dataloaders["test_data"].dataset)
+            epoch_acc = running_corrects.double() / len(dataloaders["test_data"].dataset)
+
+            #print('{} Loss: {:.4f} Acc: {:.4f}'.format("test_data", epoch_loss, epoch_acc))
+
+        # deep copy the model
+        if epoch_acc > best_acc:
+            best_acc = epoch_acc
+            best_model_wts = copy.deepcopy(model.state_dict())
+        val_acc_history.append(epoch_acc)
+
+        time_elapsed = time.time() - since
+        print('Evaluation complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        print('Val Acc: {:4f}'.format(best_acc))
+
+        # load best model weights
+        model.load_state_dict(best_model_wts)
+        return model, val_acc_history
+
 
 if __name__ == '__main__':
     model, hist = train_model(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
     torch.save(model,"resnet_fine_tuned.pkl")
-#train_model(model,optimizer=optim,num_epochs=epochs)
+    #uncomment above for 100 epochs of fine-tuning
 
-#evaluate(model,device,test_data)
+    #uncomment below for evaluation using no fine-tuning
+    # model, hist = blind_eval(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
+    # torch.save(model,"resnet_zero_shot.pkl")
