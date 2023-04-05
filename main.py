@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import PIL
 import time
-from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,7 +14,6 @@ import torchvision.transforms as T
 from torch.utils.data import Dataset
 from torchvision import datasets, models, transforms
 from torchvision.transforms import ToTensor
-import matplotlib.pyplot as plt
 
 '''
 Pytorch tutorial followed:
@@ -38,7 +36,7 @@ lr = 0.001
 feature_extract = True
 set_parameter_requires_grad(model, feature_extract)
 model.fc = nn.Linear(model.fc.in_features, num_classes)
-input_size = 224
+input_size = 64
 
 data_transforms = {
     'train_data': transforms.Compose([
@@ -93,7 +91,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
 
         # Each epoch has a training and validation phase
         for phase in ['train_data', 'test_data']:
-            #loop = tqdm(dataloaders[phase])
             if phase == 'train_data':
                 model.train()  # Set model to training mode
             else:
@@ -102,7 +99,6 @@ def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_ince
             running_loss = 0.0
             running_corrects = 0
 
-            #loop = tqdm(dataloaders[phase])
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
