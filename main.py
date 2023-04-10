@@ -4,16 +4,18 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import pickle
 import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
-from torchvision import models
 import torchvision.transforms as T
 from torch.utils.data import Dataset
 from torchvision import datasets, models, transforms
 from torchvision.transforms import ToTensor
+from PIL import Image
+from torch.autograd import Variable
 
 '''
 Pytorch tutorial followed:
@@ -28,7 +30,11 @@ def set_parameter_requires_grad(model, feature_extracting):
 torch.manual_seed(42)
 model = models.resnet101(weights=models.ResNet101_Weights.IMAGENET1K_V1)
 
+image_vectors = {}
 data_dir = "snake_images"
+for s_class in os.listdir(data_dir+"/train_data"):
+    image_vectors["train_data"] = {s_class:[]}
+    image_vectors["test_data"] = {s_class:[]}
 num_classes = len(os.listdir(data_dir+"/train_data"))
 batch_size = 8
 epochs = 100
@@ -202,6 +208,20 @@ def blind_eval(model, dataloaders, criterion, optimizer, num_epochs=25, is_incep
         model.load_state_dict(best_model_wts)
         return model, val_acc_history
 
+def get_vectors(image):
+    model.eval()
+    layer = model._modules.get('avgpool')
+    img = Image.open(image).convert('RGB')
+    trans_img = Variable(normalize(to_tensor(scaler(img))).unsqueeze(0)).to(device)
+    emb = torch.zeros(2048)
+    def copy_data(m, i, o):
+        emb.copy_(o.data.reshape(o.data.size(1)))
+    h = layer.register_forward_hook(copy_data)
+    model(trans_img)
+    h.remove()
+    return emb.tolist()
+
+    #print(model)
 
 if __name__ == '__main__':
     model, hist = train_model(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
@@ -211,3 +231,16 @@ if __name__ == '__main__':
     #uncomment below for evaluation using no fine-tuning
     # model, hist = blind_eval(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
     # torch.save(model,"resnet_zero_shot.pkl")
+
+    #uncomment below for getting image vectors from model (not fine-tuned) pretrained on imagenet
+    # scaler = transforms.Resize((224, 224))
+    # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+    #                                  std=[0.229, 0.224, 0.225])
+    # to_tensor = transforms.ToTensor()
+    # for phase in ['train_data','test_data']:
+    #     for species in os.listdir(path=data_dir+"/"+phase):
+    #         for image in os.listdir(data_dir+"/"+phase+"/"+species):
+    #             image_vectors[phase][species] = get_vectors(data_dir+"/"+phase+"/"+species+"/"+image)
+    # with open('image_vectors.pkl','wb') as fp:
+    #     pickle.dump(image_vectors,fp)
+    #     print("dict saved")
