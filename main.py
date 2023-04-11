@@ -30,11 +30,11 @@ def set_parameter_requires_grad(model, feature_extracting):
 torch.manual_seed(42)
 model = models.resnet101(weights=models.ResNet101_Weights.IMAGENET1K_V1)
 
-image_vectors = {}
+image_vectors = {"train_data":{},"test_data":{}}
 data_dir = "snake_images"
 for s_class in os.listdir(data_dir+"/train_data"):
-    image_vectors["train_data"] = {s_class:[]}
-    image_vectors["test_data"] = {s_class:[]}
+    image_vectors["train_data"][s_class]=[]
+    image_vectors["test_data"][s_class] = []
 num_classes = len(os.listdir(data_dir+"/train_data"))
 batch_size = 8
 epochs = 100
@@ -224,8 +224,8 @@ def get_vectors(image):
     #print(model)
 
 if __name__ == '__main__':
-    model, hist = train_model(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
-    torch.save(model,"resnet_fine_tuned.pkl")
+    # model, hist = train_model(model,dataloaders_dict, crit,optim, num_epochs=epochs, is_inception=False)
+    # torch.save(model,"resnet_fine_tuned.pkl")
     #uncomment above for 100 epochs of fine-tuning
 
     #uncomment below for evaluation using no fine-tuning
@@ -233,14 +233,14 @@ if __name__ == '__main__':
     # torch.save(model,"resnet_zero_shot.pkl")
 
     #uncomment below for getting image vectors from model (not fine-tuned) pretrained on imagenet
-    # scaler = transforms.Resize((224, 224))
-    # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-    #                                  std=[0.229, 0.224, 0.225])
-    # to_tensor = transforms.ToTensor()
-    # for phase in ['train_data','test_data']:
-    #     for species in os.listdir(path=data_dir+"/"+phase):
-    #         for image in os.listdir(data_dir+"/"+phase+"/"+species):
-    #             image_vectors[phase][species] = get_vectors(data_dir+"/"+phase+"/"+species+"/"+image)
-    # with open('image_vectors.pkl','wb') as fp:
-    #     pickle.dump(image_vectors,fp)
-    #     print("dict saved")
+    scaler = transforms.Resize((224, 224))
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+    to_tensor = transforms.ToTensor()
+    for phase in ['train_data','test_data']:
+        for species in os.listdir(path=data_dir+"/"+phase):
+            for image in os.listdir(data_dir+"/"+phase+"/"+species):
+                image_vectors[phase][species].append(get_vectors(data_dir+"/"+phase+"/"+species+"/"+image))
+    with open('image_vectors.pkl','wb') as fp:
+        pickle.dump(image_vectors,fp)
+        print("dict saved")
