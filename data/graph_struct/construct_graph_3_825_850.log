@@ -1,0 +1,53 @@
+2023-04-12 16:13:04,115 - __main__ - INFO - Beginning graph construction...
+2023-04-12 16:13:17,733 - __main__ - INFO - Node wd:Q32789 processed.
+2023-04-12 16:13:17,733 - __main__ - INFO - 1 / 25 nodes processed.
+2023-04-12 16:13:39,463 - __main__ - INFO - Node wd:Q274393 processed.
+2023-04-12 16:13:39,463 - __main__ - INFO - 2 / 25 nodes processed.
+2023-04-12 16:13:56,786 - __main__ - INFO - Node wd:Q38399 processed.
+2023-04-12 16:13:56,786 - __main__ - INFO - 3 / 25 nodes processed.
+2023-04-12 16:14:14,034 - __main__ - INFO - Node wd:Q147256 processed.
+2023-04-12 16:14:14,034 - __main__ - INFO - 4 / 25 nodes processed.
+2023-04-12 16:14:31,078 - __main__ - INFO - Node wd:Q47107 processed.
+2023-04-12 16:14:31,078 - __main__ - INFO - 5 / 25 nodes processed.
+2023-04-12 16:14:46,737 - __main__ - INFO - Node wd:Q17240 processed.
+2023-04-12 16:14:46,737 - __main__ - INFO - 6 / 25 nodes processed.
+2023-04-12 16:15:01,999 - __main__ - INFO - Node wd:Q2947719 processed.
+2023-04-12 16:15:01,999 - __main__ - INFO - 7 / 25 nodes processed.
+2023-04-12 16:15:18,861 - __main__ - INFO - Node wd:Q1127483 processed.
+2023-04-12 16:15:18,861 - __main__ - INFO - 8 / 25 nodes processed.
+2023-04-12 16:15:32,852 - __main__ - WARNING - Query for wd:Q7186137 failed. Likely due to timeout. Trying again...
+2023-04-12 16:15:50,041 - __main__ - INFO - Node wd:Q7186137 processed.
+2023-04-12 16:15:50,041 - __main__ - INFO - 9 / 25 nodes processed.
+2023-04-12 16:16:05,588 - __main__ - INFO - Node wd:Q41577 processed.
+2023-04-12 16:16:05,588 - __main__ - INFO - 10 / 25 nodes processed.
+2023-04-12 16:16:24,232 - __main__ - INFO - Node wd:Q21080 processed.
+2023-04-12 16:16:24,232 - __main__ - INFO - 11 / 25 nodes processed.
+2023-04-12 16:16:40,013 - __main__ - INFO - Node wd:Q887471 processed.
+2023-04-12 16:16:40,013 - __main__ - INFO - 12 / 25 nodes processed.
+2023-04-12 16:16:55,623 - __main__ - INFO - Node wd:Q163733 processed.
+2023-04-12 16:16:55,623 - __main__ - INFO - 13 / 25 nodes processed.
+2023-04-12 16:17:14,770 - __main__ - INFO - Node wd:Q38090 processed.
+2023-04-12 16:17:14,770 - __main__ - INFO - 14 / 25 nodes processed.
+2023-04-12 16:17:30,391 - __main__ - INFO - Node wd:Q485071 processed.
+2023-04-12 16:17:30,391 - __main__ - INFO - 15 / 25 nodes processed.
+2023-04-12 16:17:47,863 - __main__ - INFO - Node wd:Q122783 processed.
+2023-04-12 16:17:47,863 - __main__ - INFO - 16 / 25 nodes processed.
+2023-04-12 16:18:06,387 - __main__ - INFO - Node wd:Q12876 processed.
+2023-04-12 16:18:06,387 - __main__ - INFO - 17 / 25 nodes processed.
+2023-04-12 16:18:22,247 - __main__ - INFO - Node wd:Q164240 processed.
+2023-04-12 16:18:22,247 - __main__ - INFO - 18 / 25 nodes processed.
+2023-04-12 16:18:37,439 - __main__ - INFO - Node wd:Q1058689 processed.
+2023-04-12 16:18:37,439 - __main__ - INFO - 19 / 25 nodes processed.
+2023-04-12 16:18:53,179 - __main__ - INFO - Node wd:Q215601 processed.
+2023-04-12 16:18:53,179 - __main__ - INFO - 20 / 25 nodes processed.
+2023-04-12 16:19:17,615 - __main__ - INFO - Node wd:Q38487 processed.
+2023-04-12 16:19:17,615 - __main__ - INFO - 21 / 25 nodes processed.
+2023-04-12 16:19:32,922 - __main__ - INFO - Node wd:Q1049642 processed.
+2023-04-12 16:19:32,922 - __main__ - INFO - 22 / 25 nodes processed.
+2023-04-12 16:19:48,603 - __main__ - INFO - Node wd:Q1874394 processed.
+2023-04-12 16:19:48,603 - __main__ - INFO - 23 / 25 nodes processed.
+2023-04-12 16:20:04,302 - __main__ - INFO - Node wd:Q102626 processed.
+2023-04-12 16:20:04,302 - __main__ - INFO - 24 / 25 nodes processed.
+2023-04-12 16:20:19,466 - __main__ - INFO - Node wd:Q188691 processed.
+2023-04-12 16:20:19,466 - __main__ - INFO - 25 / 25 nodes processed.
+2023-04-12 16:20:22,466 - __main__ - INFO - Processing complete.
