@@ -19,7 +19,7 @@ OUTPUT_FILE_NAME = f"data/graph_struct/{str(BFS_DEPTH)}-hops_graph_{str(NODE_STA
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
-fh = logging.FileHandler('data/graph_struct/construct_graph.log')
+fh = logging.FileHandler(f'data/graph_struct/construct_graph_{BFS_DEPTH}_{NODE_START}_{NODE_END}.log')
 fh.setLevel(logging.DEBUG)
 # create console handler
 ch = logging.StreamHandler()
