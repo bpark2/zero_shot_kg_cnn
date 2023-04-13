@@ -10,6 +10,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 https://towardsdatascience.com/a-beginners-guide-to-graph-neural-networks-using-pytorch-geometric-part-2-cd82c01330ab
 '''
 
+data = ''#need to set data to the dataset
+
 class GCN(torch.nn.Module):
     def __init__(self):
         super(GCN, self).__init__()
@@ -38,19 +40,35 @@ optimizer_name = "Adam"
 optimizer = getattr(torch.optim, optimizer_name)(model.parameters(), lr=lr)
 epochs = 300
 
-def train():
+def train(model, data, optimizer, loss_fn):
     model.train()
+    # Clear gradients# Clear gradients
     optimizer.zero_grad()
-    m = 2
-    loss = 0
-    for i in range(m):
-        loss += F.mse_loss(data.train_mask, data.y[data.train_mask]).backward()
-    loss /= m
+    # Forward pass
+    label, emb = model(data.x, data.edge_index)
+    # Calculate loss function
+    loss = loss_fn(label, data.y)
+    # Compute gradients
+    loss.backward()
+    # Tune parameters
     optimizer.step()
 
+    pred = label.argmax(dim=1)
+    acc = (pred == data.y).sum() / len(data.y)
+
+    return loss, acc, pred
+
+criterion = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+losses = []
+accuracies = []
+outputs = []
+
 for epoch in range(1,epochs):
-    print("AHHHH")
-# @torch.no_grad()
-# def test():
-#     model.eval()
-#     logits = model()
+    loss, acc, pred = train(model, data, optimizer, criterion)
+    losses.append(loss)
+    accuracies.append(acc)
+    outputs.append(pred)
+    if epoch % 10 == 0:
+        print(f'Epoch {epoch:>3} | Loss: {loss:.2f}% | Acc: {acc*100:.2f}%')

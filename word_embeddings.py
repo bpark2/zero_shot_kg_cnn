@@ -120,10 +120,10 @@ def get_vector(word_vectors, word):
 
 
 if __name__ == '__main__':
-    text_file = os.path.join(data_dir, 'list', 'invdict_wordntext.json')
+    text_file = 'data/graph_struct/labels.json'
 
     model_path = ''#add model path here later
-    save_file = os.path.join(data_dir, 'word_embedding_model', 'glove_word2vec_wordnet.pkl')
+    save_file = os.path.join(data_dir, 'word_embedding_model', 'labels.pkl')
     if not os.path.exists(save_file):
         word_vectors = GloVe('6B')
         # get_vector = glove_google
