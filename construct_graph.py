@@ -10,8 +10,8 @@ TARGET_INCREMENT = 100
 CHUNK_DELAY_SECONDS = 1
 NODE_DELAY_SECONDS = 3
 FAIL_DELAY_SECONDS = 2
-NODE_START = 0 # specify the starting place in the wikidata mapping 
-NODE_END = 5 # specify the end node 
+NODE_START = 820 # specify the starting place in the wikidata mapping 
+NODE_END = 821 # specify the end node 
 OUTPUT_FILE_NAME = f"data/graph_struct/{str(BFS_DEPTH)}-hops_graph_{str(NODE_START)}-{str(NODE_END)}.json"
 
 
@@ -19,8 +19,8 @@ OUTPUT_FILE_NAME = f"data/graph_struct/{str(BFS_DEPTH)}-hops_graph_{str(NODE_STA
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
-fh = logging.FileHandler(f'data/graph_struct/construct_graph_{BFS_DEPTH}_{NODE_START}_{NODE_END}.log')
-fh.setLevel(logging.DEBUG)
+fh = logging.FileHandler(f'data/graph_struct/logs/construct_graph_{BFS_DEPTH}_{NODE_START}_{NODE_END}.log')
+fh.setLevel(logging.WARNING)
 # create console handler
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
@@ -171,19 +171,24 @@ adj_dict = dict()
 logger.info("Beginning graph construction...")
 with open(OUTPUT_FILE_NAME, "w") as out: 
     out.write("[") 
+
     i = 0
 
     for i in range(0, n): 
         # clear out the dictionary
         adj_dict = dict()
         process_node(source_nodes[i], nodes, k = BFS_DEPTH, increment = TARGET_INCREMENT)
-        out.write(json.dumps(adj_dict))
+        with open(OUTPUT_FILE_NAME, "a") as out:
+            out.write(json.dumps(adj_dict))
+            if i != n: 
+                out.write(", ")
         i += 1
         logger.info(f"{i} / {n} nodes processed.")
         time.sleep(NODE_DELAY_SECONDS)
-        if i != n: 
-          out.write(", ")
+        
 
+with open(OUTPUT_FILE_NAME, "a") as out:
     out.write("]")
+
 
 logger.info("Processing complete.")
