@@ -3,19 +3,34 @@ import torchvision.transforms as transforms
 from torchvision import datasets
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-import json
+import pickle
+from sklearn import preprocessing
 
-# loading training data
-train_dataset = datasets.MNIST(root='./data',
-                               train=True,
-                               transform=transforms.ToTensor(),
-                               download=True)
-# loading test data
-test_dataset = datasets.MNIST(root='./data',
-                              train=False,
-                              transform=transforms.ToTensor())
+# load in the data from file
+dataset = pickle.load(open('image_vectors_subset.pkl', 'rb'))
 
-dataset = json.load(open('image_vectors.json'))
+# change the outputs from string labels to numeric
+
+le = preprocessing.LabelEncoder()
+
+def relabel_data(encoder, data):
+    """
+
+    Args:
+        encoder:
+        data:
+
+    Returns:
+
+    """
+    tensors_labels = list(zip(*data))
+    targets = le.fit_transform(tensors_labels[1])
+    relabeled_data = [tensors_labels[0], targets]
+    relabeled_data = list(zip(*relabeled_data))
+    return relabeled_data
+
+dataset['train_data'] = relabel_data(le, dataset['train_data'])
+dataset['test_data'] = relabel_data(le, dataset['test_data'])
 
 # load train and test data samples into dataloader
 batch_size = 32
@@ -34,7 +49,7 @@ class LogisticRegression(torch.nn.Module):
         return y_pred
 
 # instantiate the model
-n_inputs = 32 # size of image feature vector
+n_inputs = 2048 # size of image feature vector
 n_outputs = 3 # number of possible output classes
 log_regr = LogisticRegression(n_inputs, n_outputs)
 
@@ -60,7 +75,7 @@ for epoch in range(epochs):
         outputs = log_regr(vects)
         _, predicted = torch.max(outputs.data, 1)
         correct += (predicted == labels).sum()
-    accuracy = 100 * (correct.item()) / len(test_dataset)
+    accuracy = 100 * (correct.item()) / len(dataset['test_data'])
     acc.append(accuracy)
     print('Epoch: {}. Loss: {}. Accuracy: {}'.format(epoch, loss.item(), accuracy))
 
