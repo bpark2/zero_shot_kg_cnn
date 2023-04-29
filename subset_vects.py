@@ -1,7 +1,7 @@
 # subset the image vectors to only contain test/train data for the seen and unseen classes we are using for the project
 import pickle
 
-with open('image_vectors_emb.pkl', 'rb') as f:
+with open('data/image_vectors_emb.pkl', 'rb') as f:
     data = pickle.load(f)
 
 subset_data = dict()
@@ -12,7 +12,7 @@ test_data = data['test_data']
 subset_data['train_data'] = []
 subset_data['test_data'] = []
 
-save_labels = ['northern_watersnake', 'boa_constrictor', 'rough_greensnake']
+save_labels = ['northern_watersnake', 'boa_constrictor'] # , 'rough_greensnake'
 
 for tensor, label in train_data:
     if label in save_labels:

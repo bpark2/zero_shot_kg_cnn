@@ -5,9 +5,10 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import pickle
 from sklearn import preprocessing
+import numpy as np
 
 # load in the data from file
-dataset = pickle.load(open('image_vectors_subset.pkl', 'rb'))
+dataset = pickle.load(open('data/image_vectors_subset.pkl', 'rb'))
 
 # change the outputs from string labels to numeric
 
@@ -17,10 +18,10 @@ def relabel_data(encoder, data):
     """
 
     Args:
-        encoder:
-        data:
+        encoder: LabelEncoder for use translating string labels to numeric
+        data: the data to convert the labels for
 
-    Returns:
+    Returns: a list of (tensor, int) tuples with the new numeric labels
 
     """
     tensors_labels = list(zip(*data))
@@ -48,15 +49,17 @@ class LogisticRegression(torch.nn.Module):
         y_pred = torch.sigmoid(self.linear(x))
         return y_pred
 
+# create a model per class
+
 # instantiate the model
 n_inputs = 2048 # size of image feature vector
-n_outputs = 3 # number of possible output classes
+n_outputs = 1 # number of possible output classes
 log_regr = LogisticRegression(n_inputs, n_outputs)
 
 # defining the optimizer
 optimizer = torch.optim.SGD(log_regr.parameters(), lr=0.001)
-# defining Cross-Entropy loss
-criterion = torch.nn.CrossEntropyLoss()
+# defining Binary Cross-Entropy loss
+criterion = torch.nn.BCELoss()
 
 epochs = 50
 Loss = []
@@ -65,7 +68,7 @@ for epoch in range(epochs):
     for i, (vects, labels) in enumerate(train_loader):
         optimizer.zero_grad()
         outputs = log_regr(vects)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs, labels.unsqueeze(-1).float())
         # Loss.append(loss.item())
         loss.backward()
         optimizer.step()
@@ -73,11 +76,18 @@ for epoch in range(epochs):
     correct = 0
     for vects, labels in test_loader:
         outputs = log_regr(vects)
-        _, predicted = torch.max(outputs.data, 1)
-        correct += (predicted == labels).sum()
+        predicted = torch.squeeze(outputs).round().detach().numpy()
+        correct += np.sum((predicted == labels.detach().numpy()))
     accuracy = 100 * (correct.item()) / len(dataset['test_data'])
     acc.append(accuracy)
     print('Epoch: {}. Loss: {}. Accuracy: {}'.format(epoch, loss.item(), accuracy))
+
+model_weights = log_regr.parameters()
+classifier = list(model_weights)[0].data
+
+# save the classifier
+with open("data/target.pkl", "wb") as f:
+    pickle.dump(classifier, f)
 
 plt.plot(Loss)
 plt.xlabel("no. of epochs")
