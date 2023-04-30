@@ -1,37 +1,42 @@
 import torch
-import torchvision.transforms as transforms
-from torchvision import datasets
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import pickle
-from sklearn import preprocessing
 import numpy as np
+
+torch.manual_seed(42)
+
+TARGET = "boa_constrictor" # alt: boa_constrictor
+TARGET_IDX = 467 # 467 for boa
 
 # load in the data from file
 dataset = pickle.load(open('data/image_vectors_subset.pkl', 'rb'))
 
 # change the outputs from string labels to numeric
-
-le = preprocessing.LabelEncoder()
-
-def relabel_data(encoder, data):
+def relabel_data(data, target):
     """
-
+    Relabel the data so that only data with the specified target label is 1, else 0.
     Args:
-        encoder: LabelEncoder for use translating string labels to numeric
-        data: the data to convert the labels for
+        data: data to relabel
+        target: class to label as 1
 
-    Returns: a list of (tensor, int) tuples with the new numeric labels
-
+    Returns:
+        relabelled data, in [(vector, label), .., (vector, label)] format
     """
     tensors_labels = list(zip(*data))
-    targets = le.fit_transform(tensors_labels[1])
-    relabeled_data = [tensors_labels[0], targets]
-    relabeled_data = list(zip(*relabeled_data))
-    return relabeled_data
+    new_labels = []
+    for label in tensors_labels[1]:
+        if label == target:
+            new_labels.append(1)
+        else:
+            new_labels.append(0)
+    relabelled_data = [tensors_labels[0], new_labels]
+    relabelled_data = list(zip(*relabelled_data))
+    return relabelled_data
 
-dataset['train_data'] = relabel_data(le, dataset['train_data'])
-dataset['test_data'] = relabel_data(le, dataset['test_data'])
+
+dataset['train_data'] = relabel_data(dataset['train_data'], TARGET)
+dataset['test_data'] = relabel_data(dataset['test_data'], TARGET)
 
 # load train and test data samples into dataloader
 batch_size = 32
@@ -86,7 +91,7 @@ model_weights = log_regr.parameters()
 classifier = list(model_weights)[0].data
 
 # save the classifier
-with open("data/target.pkl", "wb") as f:
+with open(f"data/targets/{TARGET_IDX}_target_classifier.pkl", "wb") as f:
     pickle.dump(classifier, f)
 
 plt.plot(Loss)

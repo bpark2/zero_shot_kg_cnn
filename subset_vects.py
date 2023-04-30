@@ -9,22 +9,27 @@ subset_data = dict()
 train_data = data['train_data']
 test_data = data['test_data']
 
-subset_data['train_data'] = []
-subset_data['test_data'] = []
+def subset_by_label(labels, fileout):
+    subset_data['train_data'] = []
+    subset_data['test_data'] = []
 
-save_labels = ['northern_watersnake', 'boa_constrictor'] # , 'rough_greensnake'
+    for tensor, label in train_data:
+        if label in labels:
+            subset_data['train_data'].append((tensor, label))
 
-for tensor, label in train_data:
-    if label in save_labels:
-        subset_data['train_data'].append((tensor, label))
+    for tensor, label in test_data:
+        if label in labels:
+            subset_data['test_data'].append((tensor, label))
 
-for tensor, label in test_data:
-    if label in save_labels:
-        subset_data['test_data'].append((tensor, label))
+    with open(fileout, "wb") as f:
+        pickle.dump(subset_data, f)
 
-with open("data/image_vectors_subset.pkl", "wb") as f:
-    pickle.dump(subset_data, f)
 
+seen_labels = ['northern_watersnake', 'boa_constrictor']
+unseen_labels = ['rough_greensnake']
+
+subset_by_label(seen_labels, "data/image_vectors_seen.pkl")
+subset_by_label(unseen_labels, "data/image_vectors_unseen.pkl")
 
 # test the new dataset
 # with open("image_vectors_subset.pkl", "rb") as f:
