@@ -12,21 +12,21 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 https://towardsdatascience.com/a-beginners-guide-to-graph-neural-networks-using-pytorch-geometric-part-2-cd82c01330ab
 '''
 
-data = ''#need to set data to the dataset
-
 # node features (x)
 with open("data/word_embedding_model/labels.pkl", "rb") as f:
     x = pickle.load(f)
     x = torch.from_numpy(x)
-    x = torch.t(x)
+    x = x.float().to(device)
+    # x = torch.t(x)
 
 # edge index
 with open("data/graph_struct/edge_index.pkl", "rb") as f:
-    edge_index = pickle.load(f)
+    edge_index = pickle.load(f).to(device)
+
 
 # load in the targets
 with open("data/target.pkl", "rb") as f:
-    targets = pickle.load(f)
+    targets = pickle.load(f).to(device)
 
 data = Data(x = x, edge_index = edge_index, y = targets)
 
@@ -51,7 +51,7 @@ class GCN(torch.nn.Module):
         x = F.leaky_relu(self.conv6(x,edge_index),0.2)
         return F.log_softmax(x,dim=1) #edit this later
 
-model = GCN(1737, 2048).to(device)
+model = GCN(300, 2048).to(device)
 
 lr = 1e-3
 wd = 5e-4
@@ -64,7 +64,7 @@ def train(model, data, optimizer, loss_fn):
     # Clear gradients
     optimizer.zero_grad()
     # Forward pass
-    pred, emb = model(data.x, data.edge_index)
+    pred = model(data.x, data.edge_index)
     # Calculate loss function
     loss = loss_fn(pred, data.y)
     # Compute gradients
